@@ -34,7 +34,7 @@ const getClothingItems = async (req, res, next) => {
 
 const deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
-  console.log(itemId, "itemId");
+  console.log(itemId, "itemId line 37");
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then(() => {
