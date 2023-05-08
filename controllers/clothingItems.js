@@ -31,13 +31,14 @@ const getClothingItems = async (req, res, next) => {
 };
 
 // delete clothing item by id
+
 const deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
   console.log(itemId, "itemId");
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then(() => {
-      res.status(204).send({});
+      res.status(204).send();
     })
     .catch((err) => errorHandler(err, req, res));
 };
