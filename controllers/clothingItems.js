@@ -37,11 +37,9 @@ const deleteClothingItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then(() => {
-      res
-        .status(204)
-        .send({})
-        .catch((err) => errorHandler(err, req, res));
-    });
+      res.status(204).send({});
+    })
+    .catch((err) => errorHandler(err, req, res));
 };
 
 const likeItem = async (req, res) => {
