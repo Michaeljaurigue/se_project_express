@@ -36,7 +36,7 @@ const deleteClothingItem = (req, res) => {
   console.log(itemId, "itemId");
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => {
+    .then(() => {
       res
         .status(204)
         .send({})
