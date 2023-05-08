@@ -33,6 +33,6 @@
     "nodemon": "^2.0.22",
     "prettier": "^2.8.8",
     "mongoose": "^7.1.0",
-    "validator": "^13.9.0'"
+    "validator": "^13.9.0"
   }
 }
