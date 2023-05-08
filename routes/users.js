@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", getUsers);
 
 // GET user by ID
-router.get("/users/:userId", getUser);
+router.get("/:userId", getUser);
 
 // POST new user
 router.post("/", createUser);

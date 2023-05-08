@@ -6,7 +6,7 @@ const { errorHandler } = require("../utils/errors");
 // Controller function to get a user by id
 const getUsers = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).orFail();
+    const user = await User.find(req.params.userId).orFail();
     res.json(user);
   } catch (err) {
     errorHandler(err, req, res);
