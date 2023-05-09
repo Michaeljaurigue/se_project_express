@@ -24,7 +24,6 @@ const getClothingItems = async (req, res, next) => {
   try {
     const clothingItems = await ClothingItem.find();
     res.json(clothingItems);
-    console.log(clothingItems, "clothingItems");
   } catch (error) {
     next(error);
   }
@@ -32,18 +31,17 @@ const getClothingItems = async (req, res, next) => {
 
 // delete clothing item by id
 
-const deleteClothingItem = (req, res) => {
+const deleteClothingItem = (req, res, next) => {
   const { itemId } = req.params;
-  console.log(itemId, "itemId line 37");
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then(() => {
       res.status(204).send();
     })
-    .catch((err) => errorHandler(err, req, res));
+    .catch((err) => next(err));
 };
 
-const likeItem = async (req, res) => {
+const likeItem = async (req, res, next) => {
   try {
     const item = await ClothingItem.findByIdAndUpdate(
       req.params.itemId,
@@ -52,11 +50,11 @@ const likeItem = async (req, res) => {
     ).orFail();
     res.status(200).send({ data: item });
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 };
 
-const dislikeItem = async (req, res) => {
+const dislikeItem = async (req, res, next) => {
   try {
     const item = await ClothingItem.findByIdAndUpdate(
       req.params.itemId,
@@ -65,7 +63,7 @@ const dislikeItem = async (req, res) => {
     ).orFail();
     res.status(200).send({ data: item });
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 };
 

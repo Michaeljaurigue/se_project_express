@@ -1,12 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
+const helmet = require("helmet");
+
 const { PORT = 3001 } = process.env;
 const app = express();
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
 const db = mongoose.connection;
+
 db.on("error", (err) => console.error("error connecting to db", err));
 db.once("open", () => console.log("connected to db"));
 
@@ -17,6 +20,9 @@ app.use((req, res, next) => {
   };
   next();
 });
+
+// Use the Helmet middleware
+app.use(helmet());
 
 const routes = require("./routes");
 

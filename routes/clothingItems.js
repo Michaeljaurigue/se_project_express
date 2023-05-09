@@ -20,10 +20,10 @@ router.get("/", getClothingItems);
 router.delete("/:itemId", deleteClothingItem);
 
 // like clothing item by id UPDATE
-router.put("/:itemId/like", likeItem);
+router.put("/:itemId/likes", likeItem);
 
 // dislike clothing item by id UPDATE
-router.put("/:itemId/dislike", dislikeItem);
+router.delete("/:itemId/dislikes", dislikeItem);
 
 // handle non-existent resources UPDATE
 router.use((req, res) => {
