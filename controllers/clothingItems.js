@@ -33,10 +33,14 @@ const getClothingItems = async (req, res, next) => {
 
 const deleteClothingItem = (req, res, next) => {
   const { itemId } = req.params;
+
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then(() => {
-      res.status(204).send();
+    .then((item) => {
+      res.status(200).send({
+        message: `Item with ID ${itemId} has been deleted`,
+        data: item,
+      });
     })
     .catch((err) => next(err));
 };

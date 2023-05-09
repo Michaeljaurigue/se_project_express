@@ -1,6 +1,8 @@
-const { NOT_FOUND_ERROR } = require("../utils/errorConstants");
-
 /* eslint-disable consistent-return */
+const {
+  NOT_FOUND_ERROR,
+  VALIDATION_ERROR_CODE,
+} = require("../utils/errorConstants");
 const User = require("../models/user");
 
 // Controller function to get all users
@@ -25,6 +27,7 @@ const getUser = async (req, res, next) => {
     next(err);
   }
 };
+
 // Controller function to create a new user
 const createUser = async (req, res, next) => {
   const { name, avatar } = req.body;
@@ -32,16 +35,12 @@ const createUser = async (req, res, next) => {
   // Validation
   if (!name || !avatar) {
     return res
-      .status(400)
+      .status(VALIDATION_ERROR_CODE)
       .json({ msg: "Please include a name and avatar URL" });
   }
 
   try {
-    const newUser = await User.create({
-      name,
-      avatar,
-    });
-
+    const newUser = await User.create({ name, avatar });
     res.json(newUser);
   } catch (err) {
     next(err);
