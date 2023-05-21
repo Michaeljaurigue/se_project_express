@@ -2,14 +2,19 @@ const ClothingItem = require("../models/clothingItem");
 const { errorHandler } = require("../utils/errors");
 
 // create new clothing item
+// create new clothing item
 const createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
-  const ownerId = req.user._id; // take the user ID from the req.user object
+  const ownerId = req.user && req.user._id; // Check if req.user exists before accessing _id
+  if (!ownerId) {
+    return res.status(400).json({ message: "User ID is missing" });
+  }
+
   ClothingItem.create({
     name,
     weather,
     imageUrl,
-    owner: ownerId, // set the owner field to the user ID
+    owner: ownerId,
   })
     .then((item) => {
       res.send({ data: item });

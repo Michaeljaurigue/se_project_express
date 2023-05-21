@@ -2,7 +2,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const { NOT_FOUND_ERROR, VALIDATION_ERROR_CODE } = require("../utils/config");
+const {
+  NOT_FOUND_ERROR,
+  VALIDATION_ERROR_CODE,
+} = require("../utils/errorConstants");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -45,7 +48,7 @@ const updateProfile = async (req, res, next) => {
     res.json(updatedUser);
   } catch (err) {
     if (err.name === "ValidationError") {
-      return res.status(VALIDATION_ERROR_CODE).json({ msg: err.message });
+      return res.status(400).json({ msg: err.message });
     }
     next(err);
   }
