@@ -13,14 +13,6 @@ const db = mongoose.connection;
 db.on("error", (err) => console.error("error connecting to db", err));
 db.once("open", () => console.log("connected to db"));
 
-// Add the authorization middleware
-app.use((req, res, next) => {
-  req.user = {
-    _id: "6458578d77b8a62075ae91fd",
-  };
-  next();
-});
-
 // Use the Helmet middleware
 app.use(helmet());
 
