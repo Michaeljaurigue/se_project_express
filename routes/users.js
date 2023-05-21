@@ -1,19 +1,15 @@
 const express = require("express");
-
-// const { getUsers, getUser, createUser } = require("../controllers/users");
+const userController = require("../controllers/users");
 
 const { errorHandler } = require("../utils/errors");
 
 const router = express.Router();
 
-// // GET all users
-// router.get("/", getUsers);
+// Get current user
+router.get("/me", userController.getCurrentUser);
 
-// // GET user by ID
-// router.get("/:userId", getUser);
-
-// // POST new user
-// router.post("/", createUser);
+// Patch user profile
+router.patch("/me", userController.updateProfile);
 
 // handle errors
 router.use(errorHandler);

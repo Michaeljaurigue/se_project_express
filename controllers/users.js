@@ -16,6 +16,41 @@ const getUsers = async (req, res, next) => {
   }
 };
 
+// Get Current User
+
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const { _id } = req.user; // Retrieve the user's ID from the token payload
+    const user = await User.findById(_id);
+    if (!user) {
+      return res.status(NOT_FOUND_ERROR).json({ msg: "User not found" });
+    }
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Controller function to update user profile
+const updateProfile = async (req, res, next) => {
+  try {
+    const { _id } = req.user;
+    const updates = req.body;
+    const options = { new: true, runValidators: true }; // Enable validators during update
+
+    const updatedUser = await User.findByIdAndUpdate(_id, updates, options);
+    if (!updatedUser) {
+      return res.status(NOT_FOUND_ERROR).json({ msg: "User not found" });
+    }
+    res.json(updatedUser);
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      return res.status(VALIDATION_ERROR_CODE).json({ msg: err.message });
+    }
+    next(err);
+  }
+};
+
 // Controller function to get a user by id
 const getUser = async (req, res, next) => {
   try {
@@ -110,4 +145,6 @@ module.exports = {
   getUser,
   createUser,
   login, // Add the login controller to the exported oject
+  getCurrentUser,
+  updateProfile,
 };
