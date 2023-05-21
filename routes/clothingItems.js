@@ -12,13 +12,9 @@ const authMiddleware = require("../middlewares/auth");
 const router = express.Router();
 
 router.post("/", authMiddleware, createClothingItem);
-
 router.get("/", getClothingItems);
-
 router.delete("/:itemId", authMiddleware, deleteClothingItem);
-
 router.put("/:itemId/likes", authMiddleware, likeItem);
-
 router.delete("/:itemId/dislikes", authMiddleware, dislikeItem);
 
 router.use((req, res) => {

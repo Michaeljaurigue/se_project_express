@@ -41,11 +41,6 @@ const userSchema = new mongoose.Schema({
       message: "Invalid password",
     },
   },
-  about: {
-    type: String,
-    maxlength: 1000,
-    required: false,
-  },
 });
 
 userSchema.pre("save", async function (next) {
