@@ -1,4 +1,5 @@
-/* eslint-disable consistent-return */
+const bcrypt = require("bcryptjs");
+
 const {
   NOT_FOUND_ERROR,
   VALIDATION_ERROR_CODE,
@@ -30,19 +31,43 @@ const getUser = async (req, res, next) => {
 
 // Controller function to create a new user
 const createUser = async (req, res, next) => {
-  const { name, avatar } = req.body;
+  const { name, avatar, email, password } = req.body;
 
   // Validation
-  if (!name || !avatar) {
+  if (!name || !avatar || !email || !password) {
     return res
       .status(VALIDATION_ERROR_CODE)
-      .json({ msg: "Please include a name and avatar URL" });
+      .json({ msg: "Please include name, avatar URL, email, and password" });
   }
 
   try {
-    const newUser = await User.create({ name, avatar });
+    // Check if the user already exists with the same email
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(VALIDATION_ERROR_CODE)
+        .json({ msg: "User already exists" });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
+    const newUser = await User.create({
+      name,
+      avatar,
+      email,
+      password: hashedPassword,
+    });
+
     res.json(newUser);
   } catch (err) {
+    // Handle duplicate email error
+    if (err.code === 11000) {
+      return res
+        .status(VALIDATION_ERROR_CODE)
+        .json({ msg: "User already exists" });
+    }
     next(err);
   }
 };
