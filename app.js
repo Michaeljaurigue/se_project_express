@@ -16,7 +16,6 @@ const db = mongoose.connection;
 db.on("error", (err) => console.error("error connecting to db", err));
 db.once("open", () => console.log("connected to db"));
 
-// Use the Helmet middleware
 app.use(helmet());
 
 const routes = require("./routes");

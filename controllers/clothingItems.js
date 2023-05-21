@@ -1,11 +1,10 @@
+/* eslint-disable consistent-return */
 const ClothingItem = require("../models/clothingItem");
 const { errorHandler } = require("../utils/errors");
 
-// create new clothing item
-// create new clothing item
 const createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
-  const ownerId = req.user && req.user._id; // Check if req.user exists before accessing _id
+  const ownerId = req.user && req.user._id;
   if (!ownerId) {
     return res.status(400).json({ message: "User ID is missing" });
   }
@@ -24,7 +23,6 @@ const createClothingItem = (req, res, next) => {
     });
 };
 
-// get all clothing items
 const getClothingItems = async (req, res, next) => {
   try {
     const clothingItems = await ClothingItem.find();
@@ -34,7 +32,6 @@ const getClothingItems = async (req, res, next) => {
   }
 };
 
-// delete clothing item by id
 const deleteClothingItem = (req, res, next) => {
   const { itemId } = req.params;
 
