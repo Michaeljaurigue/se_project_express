@@ -6,7 +6,7 @@ router.use("/items", itemRouter);
 router.use("/users", userRouter);
 
 // Use the NOT_FOUND_ERROR variable instead of a string literal
-const { NOT_FOUND_ERROR } = require("../utils/errorConstants");
+const { NOT_FOUND_ERROR } = require("../utils/config");
 
 router.use("*", (req, res) => {
   res.status(404).json({ message: NOT_FOUND_ERROR });

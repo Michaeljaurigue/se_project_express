@@ -1,4 +1,4 @@
-const { VALIDATION_ERROR_CODE, NOT_FOUND_ERROR } = require("./errorConstants");
+const { VALIDATION_ERROR_CODE, NOT_FOUND_ERROR } = require("./config");
 
 module.exports.errorHandler = (err, req, res, next) => {
   if (err.name === "ValidationError") {

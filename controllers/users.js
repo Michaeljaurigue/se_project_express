@@ -1,10 +1,10 @@
+/* eslint-disable consistent-return */
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-const {
-  NOT_FOUND_ERROR,
-  VALIDATION_ERROR_CODE,
-} = require("../utils/errorConstants");
+const { NOT_FOUND_ERROR, VALIDATION_ERROR_CODE } = require("../utils/config");
 const User = require("../models/user");
+const { JWT_SECRET } = require("../utils/config");
 
 // Controller function to get all users
 const getUsers = async (req, res, next) => {
@@ -72,9 +72,42 @@ const createUser = async (req, res, next) => {
   }
 };
 
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+
+    // If the user doesn't exist, return an error
+    if (!user) {
+      return res.status(VALIDATION_ERROR_CODE).json({ msg: "Invalid email" });
+    }
+
+    // Use the custom method to check the password
+    const isMatch = await user.checkPassword(password);
+
+    // If the password doesn't match, return an error
+    if (!isMatch) {
+      return res
+        .status(VALIDATION_ERROR_CODE)
+        .json({ msg: "Invalid password" });
+    }
+
+    // Create JWT token with user's _id in payload
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
+
+    // Send the token in the response body
+    res.json({ token });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Export controller functions as methods on an object
 module.exports = {
   getUsers,
   getUser,
   createUser,
+  login, // Add the login controller to the exported oject
 };
