@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-
 const bcrypt = require("bcryptjs");
+// eslint-disable-next-line import/no-extraneous-dependencies
 const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
@@ -17,32 +17,51 @@ const userSchema = new mongoose.Schema({
       "https://practicum-content.s3.us-west-1.amazonaws.com/software-engineer/wtwr-project/Elise.png",
     required: true,
     validate: {
-      validator(value) {
-        return validator.isURL(value);
-      },
+      validator: (value) => validator.isURL(value),
       message: "Invalid URL for avatar",
     },
   },
   email: {
     type: String,
     required: true,
+    unique: true,
     validate: {
-      validator(value) {
-        return validator.isEmail(value);
-      },
+      validator: (value) => validator.isEmail(value),
       message: "You must enter a valid email",
     },
-    unique: true,
   },
   password: {
     type: String,
     required: true,
     select: false,
+    minlength: 8, // Minimum password length
+    validate: {
+      validator: (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value),
+      message: "Invalid password",
+    },
   },
 });
 
+// Hash the password before saving
+// eslint-disable-next-line func-names, consistent-return
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(this.password, salt);
+      this.password = hash;
+    } catch (error) {
+      return next(error);
+    }
+  }
+  next();
+});
+
 // Method to find user by credentials
-userSchema.statics.findUserByCredentials = function (email, password) {
+userSchema.statics.findUserByCredentials = function findUserByCredentials(
+  email,
+  password
+) {
   return this.findOne({ email })
     .select("+password")
     .then((user) => {
