@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const itemRouter = require("./clothingItems");
-// const userRouter = require("./users");
+const authMiddleware = require("../middlewares/auth");
+const { NOT_FOUND_ERROR } = require("../utils/config");
+
 const {
   login,
   createUser,
@@ -9,15 +11,14 @@ const {
   getCurrentUser,
 } = require("../controllers/users");
 
-router.use("/items", itemRouter);
+router.use("/items", authMiddleware, itemRouter);
+
 router.post("/signup", createUser);
 router.post("/signin", login);
 
-router.use("/users", getUsers);
-router.use("/users", getUser);
-router.use("/users", getCurrentUser);
-// Use the NOT_FOUND_ERROR variable instead of a string literal
-const { NOT_FOUND_ERROR } = require("../utils/config");
+router.use("/users", authMiddleware, getUsers);
+router.use("/users", authMiddleware, getUser);
+router.use("/users", authMiddleware, getCurrentUser);
 
 router.use("*", (req, res) => {
   res.status(404).json({ message: NOT_FOUND_ERROR });

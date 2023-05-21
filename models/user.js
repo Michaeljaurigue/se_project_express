@@ -1,7 +1,11 @@
+/* eslint-disable consistent-return */
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 // eslint-disable-next-line import/no-extraneous-dependencies
 const validator = require("validator");
+
+// mongoose bcryptjs validator are required dependencies because they are used in the userSchema.
+// bcrypt is used to hash the password before saving it to the database. This is done using the pre-save hook. A pre-save hook is a function that is executed before saving a document to the database.
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -40,10 +44,18 @@ const userSchema = new mongoose.Schema({
       message: "Invalid password",
     },
   },
+  about: {
+    type: String,
+    maxlength: 1000,
+    required: false,
+  },
 });
 
 // Hash the password before saving
 // eslint-disable-next-line func-names, consistent-return
+// The pre-save hook is a function that is executed before saving a document to the database.The pre("save") middleware function is executed before saving a user to the database. It checks if the password field has been modified and if so, it hashes the password using bcrypt and replaces the plain text password with the hashed value. This ensures that the password is securely stored in the database. The pre-save hook is defined using the pre method on the userSchema.'
+
+// eslint-disable-next-line func-names
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     try {
