@@ -30,16 +30,26 @@ const getClothingItems = async (req, res, next) => {
 };
 
 // delete clothing item by id
-
 const deleteClothingItem = (req, res, next) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
-    .orFail()
+  ClothingItem.findById(itemId)
     .then((item) => {
+      if (!item) {
+        throw new Error("Item not found");
+      }
+
+      if (item.owner.toString() !== req.user._id.toString()) {
+        // Check if the item owner's ID is different from the logged-in user's ID
+        throw new Error("You are not authorized to delete this item");
+      }
+
+      return ClothingItem.findByIdAndDelete(itemId);
+    })
+    .then((deletedItem) => {
       res.status(200).send({
         message: `Item with ID ${itemId} has been deleted`,
-        data: item,
+        data: deletedItem,
       });
     })
     .catch((err) => next(err));
