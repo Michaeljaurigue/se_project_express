@@ -1,25 +1,18 @@
-/* eslint-disable consistent-return */
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { USER_OK } = require("../utils/errorConstants");
 const { errorHandler } = require("../utils/errors");
 
 const {
   VALIDATION_ERROR_CODE,
   NOT_FOUND_ERROR,
+  INVALID_ID_ERROR,
+  USER_OK,
+  CONFLICT_ERROR,
+  AUTHORIZATION_ERROR,
 } = require("../utils/errorConstants");
 
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
-
-const getUsers = async (req, res, next) => {
-  try {
-    const users = await User.find({});
-    res.json(users);
-  } catch (err) {
-    next(err);
-  }
-};
 
 const getCurrentUser = async (req, res, next) => {
   try {
@@ -37,30 +30,24 @@ const getCurrentUser = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const { _id } = req.user;
-    const updates = req.body;
-    const options = { new: true, runValidators: true };
+    const { name, avatar } = req.body;
 
-    const updatedUser = await User.findByIdAndUpdate(_id, updates, options);
+    const options = { new: true, runValidators: true };
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      { name, avatar },
+      options
+    );
+
     if (!updatedUser) {
       return res.status(NOT_FOUND_ERROR).json({ msg: "User not found" });
     }
+
     res.json(updatedUser);
   } catch (err) {
     if (err.name === "ValidationError") {
-      return res.status(400).json({ msg: err.message });
+      return res.status(INVALID_ID_ERROR).json({ msg: "User not found" });
     }
-    next(err);
-  }
-};
-
-const getUser = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(NOT_FOUND_ERROR).json({ msg: "User not found" });
-    }
-    res.json(user);
-  } catch (err) {
     next(err);
   }
 };
@@ -76,10 +63,9 @@ const createUser = async (req, res, next) => {
 
   try {
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      return res
-        .status(VALIDATION_ERROR_CODE)
-        .json({ msg: "User already exists" });
+      return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -91,12 +77,13 @@ const createUser = async (req, res, next) => {
       password: hashedPassword,
     });
 
-    res.json(newUser);
+    const { password: _hashedPassword, ...userWithoutPassword } = newUser._doc;
+    // Exclude password from the returned user object
+
+    res.json(userWithoutPassword);
   } catch (err) {
     if (err.code === 11000) {
-      return res
-        .status(VALIDATION_ERROR_CODE)
-        .json({ msg: "User already exists" });
+      return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
     }
     next(err);
   }
@@ -104,46 +91,20 @@ const createUser = async (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
+
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
-
       res.status(USER_OK).json({ token });
     })
-    .catch((err) => {
-      next(err);
+    .catch(() => {
+      res
+        .status(AUTHORIZATION_ERROR)
+        .json({ msg: "Invalid email or password" });
     });
 };
 
-// const login = async (req, res, next) => {
-//   const { email, password } = req.body;
-
-//   try {
-//     const user = await User.findOne({ email });
-
-//     if (!user) {
-//       return res.status(VALIDATION_ERROR_CODE).json({ msg: "Invalid email" });
-//     }
-
-//     const isMatch = await User.findUserByCredentials(email, password);
-
-//     if (!isMatch) {
-//       return res
-//         .status(VALIDATION_ERROR_CODE)
-//         .json({ msg: "Invalid password" });
-//     }
-
-//     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
-
-//     res.json({ token });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
 module.exports = {
-  getUsers,
-  getUser,
   createUser,
   login,
   getCurrentUser,

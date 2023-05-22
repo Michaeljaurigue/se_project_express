@@ -15,6 +15,7 @@ const db = mongoose.connection;
 
 db.on("error", (err) => console.error("error connecting to db", err));
 db.once("open", () => console.log("connected to db"));
+const { errorHandler } = require("./utils/errors");
 
 app.use(helmet());
 
@@ -23,6 +24,7 @@ const routes = require("./routes");
 app.use(express.json());
 app.use(routes);
 app.use(cors());
+routes.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

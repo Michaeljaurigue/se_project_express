@@ -1,5 +1,3 @@
-/* eslint-disable consistent-return */
-/* eslint-disable func-names */
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
@@ -38,19 +36,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
-    try {
-      const salt = await bcrypt.genSalt(10);
-      const hash = await bcrypt.hash(this.password, salt);
-      this.password = hash;
-    } catch (error) {
-      return next(error);
-    }
-  }
-  next();
-});
-
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select("+password")
@@ -58,17 +43,12 @@ userSchema.statics.findUserByCredentials = function (email, password) {
       if (!user) {
         throw new Error("Incorrect email or password");
       }
-      return bcrypt
-        .compare(password, user.password)
-        .then((isMatch) => {
-          if (!isMatch) {
-            throw new Error("Incorrect email or password");
-          }
-          return user;
-        })
-        .catch((err) => {
-          throw new Error(err.message);
-        });
+      return bcrypt.compare(password, user.password).then((isMatch) => {
+        if (!isMatch) {
+          throw new Error("Incorrect email or password");
+        }
+        return user;
+      });
     });
 };
 

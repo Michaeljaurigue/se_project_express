@@ -16,6 +16,9 @@ module.exports.AUTHORIZATION_ERROR = 401;
 // FORBIDDEN_ERROR is used for the forbidden error.
 module.exports.FORBIDDEN_ERROR = 403;
 
+// PAGE_NOT_FOUND_ERROR is used for the page not found error.
+module.exports.PAGE_NOT_FOUND_ERROR = 404;
+
 // CONFLICT_ERROR is used for the conflict error.
 module.exports.CONFLICT_ERROR = 409;
 

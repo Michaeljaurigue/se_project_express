@@ -1,6 +1,9 @@
-/* eslint-disable consistent-return */
 const ClothingItem = require("../models/clothingItem");
-const { INVALID_ID_ERROR } = require("../utils/errorConstants");
+const {
+  INVALID_ID_ERROR,
+  FORBIDDEN_ERROR,
+  PAGE_NOT_FOUND_ERROR,
+} = require("../utils/errorConstants");
 const { errorHandler } = require("../utils/errors");
 
 const getClothingItems = async (req, res, next) => {
@@ -15,9 +18,6 @@ const getClothingItems = async (req, res, next) => {
 const createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const ownerId = req.user && req.user._id;
-  if (!ownerId) {
-    return res.status(INVALID_ID_ERROR).json({ message: "User ID is missing" });
-  }
 
   ClothingItem.create({
     name,
@@ -38,14 +38,18 @@ const deleteClothingItem = (req, res, next) => {
 
   ClothingItem.findById(itemId)
     .then((item) => {
-      // here we check if the item exists, if it doesn't we throw an error by using the throw keyword and the new keyword Error
       if (!item) {
-        throw new Error("Item not found");
+        // Item not found
+        return res
+          .status(PAGE_NOT_FOUND_ERROR)
+          .json({ message: "Item not found" });
       }
 
       if (item.owner.toString() !== req.user._id.toString()) {
-        // Check if the item owner's ID is different from the logged-in user's ID
-        throw new Error("You are not authorized to delete this item");
+        // User is not authorized to delete this item
+        return res
+          .status(FORBIDDEN_ERROR)
+          .json({ message: "You are not authorized to delete this item" });
       }
 
       return ClothingItem.findByIdAndDelete(itemId);
