@@ -1,11 +1,14 @@
 /* eslint-disable consistent-return */
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { USER_OK } = require("../utils/errorConstants");
+const { errorHandler } = require("../utils/errors");
 
 const {
-  NOT_FOUND_ERROR,
   VALIDATION_ERROR_CODE,
+  NOT_FOUND_ERROR,
 } = require("../utils/errorConstants");
+
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -99,31 +102,45 @@ const createUser = async (req, res, next) => {
   }
 };
 
-const login = async (req, res, next) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
 
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(VALIDATION_ERROR_CODE).json({ msg: "Invalid email" });
-    }
-
-    const isMatch = await User.findUserByCredentials(email, password);
-
-    if (!isMatch) {
-      return res
-        .status(VALIDATION_ERROR_CODE)
-        .json({ msg: "Invalid password" });
-    }
-
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
-
-    res.json({ token });
-  } catch (err) {
-    next(err);
-  }
+      res.status(USER_OK).json({ token });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
+
+// const login = async (req, res, next) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     const user = await User.findOne({ email });
+
+//     if (!user) {
+//       return res.status(VALIDATION_ERROR_CODE).json({ msg: "Invalid email" });
+//     }
+
+//     const isMatch = await User.findUserByCredentials(email, password);
+
+//     if (!isMatch) {
+//       return res
+//         .status(VALIDATION_ERROR_CODE)
+//         .json({ msg: "Invalid password" });
+//     }
+
+//     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
+
+//     res.json({ token });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
 module.exports = {
   getUsers,
   getUser,
@@ -131,4 +148,5 @@ module.exports = {
   login,
   getCurrentUser,
   updateProfile,
+  errorHandler,
 };

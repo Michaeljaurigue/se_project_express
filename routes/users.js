@@ -1,12 +1,12 @@
 const express = require("express");
-const userController = require("../controllers/users");
+const { getCurrentUser, updateProfile } = require("../controllers/users");
 const { errorHandler } = require("../utils/errors");
 const authMiddleware = require("../middlewares/auth");
 
 const router = express.Router();
 
-router.get("/users/me", authMiddleware, userController.getCurrentUser);
-router.patch("/users/me", authMiddleware, userController.updateProfile);
+router.get("/me", authMiddleware, getCurrentUser);
+router.patch("/me", authMiddleware, updateProfile);
 
 router.use(errorHandler);
 

@@ -22,5 +22,8 @@ module.exports.CONFLICT_ERROR = 409;
 // DEFAULT_ERROR is used as the default error code.
 module.exports.DEFAULT_ERROR = 500;
 
+// USER_OK is used for the user OK status.
+module.exports.USER_OK = 200;
+
 
 

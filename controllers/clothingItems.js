@@ -1,12 +1,22 @@
 /* eslint-disable consistent-return */
 const ClothingItem = require("../models/clothingItem");
+const { INVALID_ID_ERROR } = require("../utils/errorConstants");
 const { errorHandler } = require("../utils/errors");
+
+const getClothingItems = async (req, res, next) => {
+  try {
+    const clothingItems = await ClothingItem.find();
+    res.json(clothingItems);
+  } catch (err) {
+    next(err);
+  }
+};
 
 const createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const ownerId = req.user && req.user._id;
   if (!ownerId) {
-    return res.status(400).json({ message: "User ID is missing" });
+    return res.status(INVALID_ID_ERROR).json({ message: "User ID is missing" });
   }
 
   ClothingItem.create({
@@ -18,18 +28,9 @@ const createClothingItem = (req, res, next) => {
     .then((item) => {
       res.send({ data: item });
     })
-    .catch((e) => {
-      next(e);
+    .catch((err) => {
+      next(err);
     });
-};
-
-const getClothingItems = async (req, res, next) => {
-  try {
-    const clothingItems = await ClothingItem.find();
-    res.json(clothingItems);
-  } catch (error) {
-    next(error);
-  }
 };
 
 const deleteClothingItem = (req, res, next) => {
@@ -37,6 +38,7 @@ const deleteClothingItem = (req, res, next) => {
 
   ClothingItem.findById(itemId)
     .then((item) => {
+      // here we check if the item exists, if it doesn't we throw an error by using the throw keyword and the new keyword Error
       if (!item) {
         throw new Error("Item not found");
       }
@@ -87,7 +89,7 @@ module.exports = {
   getClothingItems,
   createClothingItem,
   deleteClothingItem,
-  errorHandler,
   likeItem,
   dislikeItem,
+  errorHandler,
 };

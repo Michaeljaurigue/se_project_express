@@ -6,8 +6,9 @@ const {
   likeItem,
   dislikeItem,
 } = require("../controllers/clothingItems");
-const { errorHandler } = require("../utils/errors");
+// const { errorHandler } = require("../utils/errors");
 const authMiddleware = require("../middlewares/auth");
+const { errorHandler } = require("../utils/errors");
 
 const router = express.Router();
 
@@ -17,9 +18,9 @@ router.delete("/:itemId", authMiddleware, deleteClothingItem);
 router.put("/:itemId/likes", authMiddleware, likeItem);
 router.delete("/:itemId/dislikes", authMiddleware, dislikeItem);
 
-router.use((req, res) => {
-  res.status(404).json({ message: "Requested resource not found" });
-});
+// router.use((req, res) => {
+//   res.status(404).json({ message: "Requested resource not found" });
+// });
 
 router.use(errorHandler);
 

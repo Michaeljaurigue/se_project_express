@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: (value) => validator.isURL(value),
-      message: "Invalid URL for avatar",
+      message: "You must enter a valid URL",
     },
   },
   email: {
@@ -28,18 +28,13 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: (value) => validator.isEmail(value),
-      message: "You must enter a valid email",
+      message: "You must enter a valid email address",
     },
   },
   password: {
     type: String,
     required: true,
     select: false,
-    minlength: 8,
-    validate: {
-      validator: (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value),
-      message: "Invalid password",
-    },
   },
 });
 
@@ -56,22 +51,24 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.statics.findUserByCredentials = function findUserByCredentials(
-  email,
-  password
-) {
+userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select("+password")
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error("User not found"));
+        throw new Error("Incorrect email or password");
       }
-      return bcrypt.compare(password, user.password).then((isMatch) => {
-        if (!isMatch) {
-          return Promise.reject(new Error("Invalid credentials"));
-        }
-        return user;
-      });
+      return bcrypt
+        .compare(password, user.password)
+        .then((isMatch) => {
+          if (!isMatch) {
+            throw new Error("Incorrect email or password");
+          }
+          return user;
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        });
     });
 };
 
