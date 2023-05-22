@@ -4,14 +4,15 @@ const { errorHandler } = require("../utils/errors");
 
 const {
   VALIDATION_ERROR_CODE,
-  NOT_FOUND_ERROR,
-  INVALID_ID_ERROR,
   USER_OK,
+  INVALID_ID_ERROR,
+  NOT_FOUND_ERROR,
   CONFLICT_ERROR,
   AUTHORIZATION_ERROR,
 } = require("../utils/errorConstants");
 
 const User = require("../models/user");
+
 const { JWT_SECRET } = require("../utils/config");
 
 const getCurrentUser = async (req, res, next) => {
@@ -19,10 +20,49 @@ const getCurrentUser = async (req, res, next) => {
     const { _id } = req.user;
     const user = await User.findById(_id);
     if (!user) {
-      return res.status(NOT_FOUND_ERROR).json({ msg: "User not found" });
+      throw new Error("User not found");
     }
-    res.json(user);
+    const responseData = user;
+    return res.json(responseData);
   } catch (err) {
+    next(err);
+  }
+};
+
+const createUser = async (req, res, next) => {
+  const { name, avatar, email, password } = req.body;
+
+  if (!name || !avatar || !email || !password) {
+    return res
+      .status(VALIDATION_ERROR_CODE)
+      .json({ msg: "Please include name, avatar URL, email, and password" });
+  }
+
+  try {
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      throw new Error("User already exists");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await User.create({
+      name,
+      avatar,
+      email,
+      password: hashedPassword,
+    });
+
+    const { password: _hashedPassword, ...userWithoutPassword } = newUser._doc;
+    // Exclude password from the returned user object
+
+    const responseData = userWithoutPassword;
+    return res.json(responseData);
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
+    }
     next(err);
   }
 };
@@ -43,7 +83,7 @@ const updateProfile = async (req, res, next) => {
       return res.status(NOT_FOUND_ERROR).json({ msg: "User not found" });
     }
 
-    res.json(updatedUser);
+    return res.json(updatedUser); // Added return statement
   } catch (err) {
     if (err.name === "ValidationError") {
       return res.status(INVALID_ID_ERROR).json({ msg: "User not found" });
@@ -52,62 +92,26 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
-const createUser = async (req, res, next) => {
-  const { name, avatar, email, password } = req.body;
-
-  if (!name || !avatar || !email || !password) {
-    return res
-      .status(VALIDATION_ERROR_CODE)
-      .json({ msg: "Please include name, avatar URL, email, and password" });
-  }
-
-  try {
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await User.create({
-      name,
-      avatar,
-      email,
-      password: hashedPassword,
-    });
-
-    const { password: _hashedPassword, ...userWithoutPassword } = newUser.doc;
-    // Exclude password from the returned user object
-
-    res.json(userWithoutPassword);
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
-    }
-    next(err);
-  }
-};
-
-const login = (req, res, next) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
-      res.status(USER_OK).json({ token });
-    })
-    .catch(() => {
-      res
-        .status(AUTHORIZATION_ERROR)
-        .json({ msg: "Invalid email or password" });
+  try {
+    const user = await User.findUserByCredentials(email, password);
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+      expiresIn: "7d",
     });
+    return res.status(USER_OK).json({ token });
+  } catch (err) {
+    return res
+      .status(AUTHORIZATION_ERROR)
+      .json({ msg: "Invalid email or password" });
+  }
 };
 
 module.exports = {
   createUser,
   login,
-  getCurrentUser,
   updateProfile,
+  getCurrentUser,
   errorHandler,
 };
