@@ -1,6 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
 const {
-  INVALID_ID_ERROR,
   FORBIDDEN_ERROR,
   PAGE_NOT_FOUND_ERROR,
 } = require("../utils/errorConstants");

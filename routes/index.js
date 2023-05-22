@@ -1,4 +1,5 @@
 const router = require("express").Router();
+// const limiter = require("express-rate-limit");
 const itemRouter = require("./clothingItems");
 const userRouter = require("./users");
 const authMiddleware = require("../middlewares/auth");
@@ -13,7 +14,9 @@ router.use("/items", itemRouter);
 router.use("/users", authMiddleware, userRouter);
 
 router.use("*", (req, res) => {
-  res.status(PAGE_NOT_FOUND_ERROR).json({ message: "Requested resource not found" });
+  res
+    .status(PAGE_NOT_FOUND_ERROR)
+    .json({ message: "Requested resource not found" });
 });
 
 module.exports = router;

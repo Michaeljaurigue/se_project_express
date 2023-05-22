@@ -77,7 +77,7 @@ const createUser = async (req, res, next) => {
       password: hashedPassword,
     });
 
-    const { password: _hashedPassword, ...userWithoutPassword } = newUser._doc;
+    const { password: _hashedPassword, ...userWithoutPassword } = newUser.doc;
     // Exclude password from the returned user object
 
     res.json(userWithoutPassword);
