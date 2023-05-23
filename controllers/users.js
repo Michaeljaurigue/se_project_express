@@ -25,7 +25,7 @@ const getCurrentUser = async (req, res, next) => {
     const responseData = user;
     return res.json(responseData);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -42,7 +42,7 @@ const createUser = async (req, res, next) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      throw new Error("User already exists");
+      return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -63,7 +63,7 @@ const createUser = async (req, res, next) => {
     if (err.code === 11000) {
       return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
     }
-    next(err);
+    return next(err);
   }
 };
 
@@ -88,7 +88,7 @@ const updateProfile = async (req, res, next) => {
     if (err.name === "ValidationError") {
       return res.status(INVALID_ID_ERROR).json({ msg: "User not found" });
     }
-    next(err);
+    return next(err);
   }
 };
 

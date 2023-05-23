@@ -5,7 +5,7 @@ const {
   DEFAULT_ERROR,
 } = require("./errorConstants");
 
-module.exports.errorHandler = (err, req, res) => {
+module.exports.errorHandler = (err, req, res, next) => {
   if (err.name === "ValidationError") {
     const fieldName = Object.keys(err.errors)[0];
     res.status(VALIDATION_ERROR_CODE).send({
@@ -24,4 +24,5 @@ module.exports.errorHandler = (err, req, res) => {
       message: "An error has occurred on the server",
     });
   }
+  next();
 };
