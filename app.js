@@ -22,7 +22,17 @@ app.use(helmet());
 const routes = require("./routes");
 
 app.use(express.json());
-app.use(cors());
+
+// Step 1: Specify allowed origin
+app.use(
+  cors({
+    origin: [
+      "https://wtwrapp.weatherlab.xyz",
+      "https://www.wtwrapp.weatherlab.xyz",
+    ],
+  })
+);
+
 app.use(routes);
 
 routes.use(errorHandler);
