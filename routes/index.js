@@ -8,6 +8,13 @@ const { login, createUser } = require("../controllers/users");
 const { PAGE_NOT_FOUND_ERROR } = require("../utils/errorConstants");
 
 router.post("/signin", login);
+
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
 router.post("/signup", createUser);
 
 router.use("/items", itemRouter);
