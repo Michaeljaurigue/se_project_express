@@ -6,16 +6,14 @@ const authMiddleware = require("../middlewares/auth");
 // const { NOT_FOUND_ERROR } = require("../utils/config");
 const { login, createUser } = require("../controllers/users");
 const { PAGE_NOT_FOUND_ERROR } = require("../utils/errorConstants");
+const {
+  validateUserInfo,
+  validateUserLoginInfo,
+} = require("../middlewares/validation");
 
-router.post("/signin", login);
+router.post("/signin", validateUserLoginInfo, login);
 
-app.get("/crash-test", () => {
-  setTimeout(() => {
-    throw new Error("Server will crash now");
-  }, 0);
-});
-
-router.post("/signup", createUser);
+router.post("/signup", validateUserInfo, createUser);
 
 router.use("/items", itemRouter);
 router.use("/users", authMiddleware, userRouter);

@@ -2,14 +2,11 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { errorHandler } = require("../utils/errors");
 
-const {
-  VALIDATION_ERROR_CODE,
-  USER_OK,
-  INVALID_ID_ERROR,
-  NOT_FOUND_ERROR,
-  CONFLICT_ERROR,
-  AUTHORIZATION_ERROR,
-} = require("../utils/errorConstants");
+const { VALIDATION_ERROR_CODE, USER_OK } = require("../utils/errorConstants");
+
+const NotFoundError = require("../errors/NotFoundError");
+const AuthorizationError = require("../errors/UnauthorizedError");
+const ConflictError = require("../errors/ConflictError");
 
 const User = require("../models/user");
 
@@ -42,7 +39,7 @@ const createUser = async (req, res, next) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
+      return new ConflictError("Conflict error");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -61,7 +58,7 @@ const createUser = async (req, res, next) => {
     return res.json(responseData);
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(CONFLICT_ERROR).json({ msg: "User already exists" });
+      return new ConflictError("Conflict error");
     }
     return next(err);
   }
@@ -80,13 +77,13 @@ const updateProfile = async (req, res, next) => {
     );
 
     if (!updatedUser) {
-      return res.status(NOT_FOUND_ERROR).json({ msg: "User not found" });
+      return new NotFoundError("User not found");
     }
 
     return res.json(updatedUser); // Added return statement
   } catch (err) {
     if (err.name === "ValidationError") {
-      return res.status(INVALID_ID_ERROR).json({ msg: "User not found" });
+      return new ConflictError("Conflict error");
     }
     return next(err);
   }
@@ -102,9 +99,7 @@ const login = async (req, res) => {
     });
     return res.status(USER_OK).json({ token });
   } catch (err) {
-    return res
-      .status(AUTHORIZATION_ERROR)
-      .json({ msg: "Invalid email or password" });
+    return new AuthorizationError("Authorization error");
   }
 };
 

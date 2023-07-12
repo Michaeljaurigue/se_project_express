@@ -9,14 +9,18 @@ const {
 } = require("../controllers/clothingItems");
 // const { errorHandler } = require("../utils/errors");
 const authMiddleware = require("../middlewares/auth");
+const {
+  validateItemBody,
+  validateItemId,
+} = require("../middlewares/validation");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, createClothingItem);
+router.post("/", validateItemBody, authMiddleware, createClothingItem);
 router.get("/", getClothingItems);
-router.delete("/:itemId", authMiddleware, deleteClothingItem);
-router.put("/:itemId/likes", authMiddleware, likeItem);
-router.delete("/:itemId/likes", authMiddleware, dislikeItem);
+router.delete("/:itemId", validateItemId, authMiddleware, deleteClothingItem);
+router.put("/:itemId/likes", validateItemId, authMiddleware, likeItem);
+router.delete("/:itemId/likes", validateItemId, authMiddleware, dislikeItem);
 
 // router.use((req, res) => {
 //   res.status(404).json({ message: "Requested resource not found" });

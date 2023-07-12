@@ -1,4 +1,8 @@
 const ClothingItem = require("../models/clothingItem");
+const NotFoundError = require("../middlewares/notFoundError");
+const ForbiddenError = require("../middlewares/forbiddenError");
+const BadRequestError = require("../middlewares/badRequestError");
+
 const {
   FORBIDDEN_ERROR,
   PAGE_NOT_FOUND_ERROR,
@@ -28,7 +32,9 @@ const createClothingItem = (req, res, next) => {
       res.send({ data: item });
     })
     .catch((err) => {
-      next(err);
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError(err.message));
+      }
     });
 };
 
@@ -39,16 +45,14 @@ const deleteClothingItem = (req, res, next) => {
     .then((item) => {
       if (!item) {
         // Item not found
-        return res
-          .status(PAGE_NOT_FOUND_ERROR)
-          .json({ message: "Item not found" });
+        return next(new NotFoundError("Item not found"));
       }
 
       if (item.owner.toString() !== req.user._id.toString()) {
         // User is not authorized to delete this item
-        return res
-          .status(FORBIDDEN_ERROR)
-          .json({ message: "You are not authorized to delete this item" });
+        return next(
+          new ForbiddenError("You are not authorized to delete this item")
+        );
       }
 
       return ClothingItem.findByIdAndDelete(itemId);
@@ -59,7 +63,10 @@ const deleteClothingItem = (req, res, next) => {
         data: deletedItem,
       });
     })
-    .catch((err) => next(err));
+    .catch(() => {
+      // Catch all errors
+      next(new BadRequestError("Invalid item ID"));
+    });
 };
 
 const likeItem = async (req, res, next) => {
