@@ -1,5 +1,7 @@
 Welcome to the exciting world of WTWR (What to Wear?) project! In this project, we set up a super cool API to keep track of our stylish users and their fabulous clothing items.
 
+Check out the api at https://api.wtwrapp.weatherlab.xyz/
+
 To make it all happen, we used MongoDB, a non-relational database with a sleek and modern heirarchical structure. This allowed us to assign ID numbers to items with ease, and made for a more fluid and intuitive storage solution than traditional relational databases like MySQL. Plus, with MongoDB's user interface, we were able to manipulate data with ease and keep our codebase streamlined and compact.
 
 We also implemented user authentication and authorization, ensuring that only authorized users could access their respective data. With consolidated error handling via our ErrorHandler function, we reduced the need for repeating code and made the process even smoother.
