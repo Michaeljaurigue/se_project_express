@@ -1,5 +1,4 @@
 const express = require("express");
-// const limiter = require("express-rate-limit");
 const {
   getClothingItems,
   createClothingItem,
@@ -7,7 +6,6 @@ const {
   likeItem,
   dislikeItem,
 } = require("../controllers/clothingItems");
-// const { errorHandler } = require("../utils/errors");
 const authMiddleware = require("../middlewares/auth");
 const {
   validateItemBody,
@@ -16,14 +14,14 @@ const {
 
 const router = express.Router();
 
-router.post("/", validateItemBody, authMiddleware, createClothingItem);
 router.get("/", getClothingItems);
-router.delete("/:itemId", validateItemId, authMiddleware, deleteClothingItem);
-router.put("/:itemId/likes", validateItemId, authMiddleware, likeItem);
-router.delete("/:itemId/likes", validateItemId, authMiddleware, dislikeItem);
 
-// router.use((req, res) => {
-//   res.status(404).json({ message: "Requested resource not found" });
-// });
+router.post("/", authMiddleware, validateItemBody, createClothingItem);
+
+router.delete("/:itemId", authMiddleware, validateItemId, deleteClothingItem);
+
+router.put("/:itemId/likes", authMiddleware, validateItemId, likeItem);
+
+router.delete("/:itemId/likes", authMiddleware, validateItemId, dislikeItem);
 
 module.exports = router;

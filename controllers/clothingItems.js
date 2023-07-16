@@ -17,7 +17,6 @@ const getClothingItems = async (req, res, next) => {
     next(err);
   }
 };
-
 const createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const ownerId = req.user && req.user._id;
@@ -34,6 +33,8 @@ const createClothingItem = (req, res, next) => {
     .catch((err) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError(err.message));
+      } else {
+        next(err);
       }
     });
 };
@@ -45,14 +46,12 @@ const deleteClothingItem = (req, res, next) => {
     .then((item) => {
       if (!item) {
         // Item not found
-        return next(new NotFoundError("Item not found"));
+        throw new NotFoundError("Item not found");
       }
 
       if (item.owner.toString() !== req.user._id.toString()) {
         // User is not authorized to delete this item
-        return next(
-          new ForbiddenError("You are not authorized to delete this item")
-        );
+        throw new ForbiddenError("You are not authorized to delete this item");
       }
 
       return ClothingItem.findByIdAndDelete(itemId);
@@ -63,9 +62,9 @@ const deleteClothingItem = (req, res, next) => {
         data: deletedItem,
       });
     })
-    .catch(() => {
+    .catch((err) => {
       // Catch all errors
-      next(new BadRequestError("Invalid item ID"));
+      next(err);
     });
 };
 
@@ -78,10 +77,13 @@ const likeItem = async (req, res, next) => {
     ).orFail();
     res.status(200).send({ data: item });
   } catch (err) {
-    next(err);
+    if (err.name === "DocumentNotFoundError") {
+      next(new NotFoundError("Not found"));
+    } else {
+      next(err);
+    }
   }
 };
-
 const dislikeItem = async (req, res, next) => {
   try {
     const item = await ClothingItem.findByIdAndUpdate(
@@ -91,7 +93,11 @@ const dislikeItem = async (req, res, next) => {
     ).orFail();
     res.status(200).send({ data: item });
   } catch (err) {
-    next(err);
+    if (err.name === "DocumentNotFoundError") {
+      next(new NotFoundError("Not found"));
+    } else {
+      next(err);
+    }
   }
 };
 
