@@ -2,10 +2,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { errorHandler } = require("../utils/errors");
 
-const { VALIDATION_ERROR_CODE, USER_OK } = require("../utils/errorConstants");
+const { USER_OK } = require("../utils/errorConstants");
 
 const NotFoundError = require("../middlewares/notFoundError");
-const UnauthorizedError = require("../middlewares/unauthorizedError");
+const AuthorizationError = require("../middlewares/unauthorizedError");
 const ConflictError = require("../middlewares/conflictError");
 
 const User = require("../models/user");

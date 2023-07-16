@@ -3,10 +3,6 @@ const NotFoundError = require("../middlewares/notFoundError");
 const ForbiddenError = require("../middlewares/forbiddenError");
 const BadRequestError = require("../middlewares/badRequestError");
 
-const {
-  FORBIDDEN_ERROR,
-  PAGE_NOT_FOUND_ERROR,
-} = require("../utils/errorConstants");
 const { errorHandler } = require("../utils/errors");
 
 const getClothingItems = async (req, res, next) => {
