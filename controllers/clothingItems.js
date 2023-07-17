@@ -13,6 +13,8 @@ const getClothingItems = async (req, res, next) => {
     next(err);
   }
 };
+
+//this is the function that will be called when a user clicks on a specific item
 const createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const ownerId = req.user && req.user._id;
