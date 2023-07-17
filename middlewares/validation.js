@@ -1,5 +1,7 @@
 const { Joi, celebrate } = require("celebrate");
+
 const validator = require("validator");
+
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
     return value;
@@ -31,6 +33,7 @@ module.exports.validateItemBody = celebrate({
     })
     .unknown(false),
 });
+
 module.exports.validateUserInfo = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).messages({
@@ -42,36 +45,31 @@ module.exports.validateUserInfo = celebrate({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'The "imageUrl" field must be a valid URL',
     }),
-    email: Joi.string()
-      .required()
-      .email()
-      .messages({ "string.email": "Please enter a valid email" }),
-    password: Joi.string()
-      .required()
-      .min(8)
-      .messages({ "string.min": "Password must be at least 8 characters." }),
+    email: Joi.string().required().email().messages({
+      "string.email": "Please enter a valid email",
+    }),
+    password: Joi.string().required().min(8).messages({
+      "string.min": "Password must be at least 8 characters.",
+    }),
   }),
 });
 
 module.exports.validateUserLoginInfo = celebrate({
   body: Joi.object().keys({
-    email: Joi.string()
-      .required()
-      .email()
-      .messages({ "string.email": "Please enter a valid email" }),
-    password: Joi.string()
-      .required()
-      .min(8)
-      .messages({ "string.min": "Passowrd must be at least 8 characters." }),
+    email: Joi.string().required().email().messages({
+      "string.email": "Please enter a valid email",
+    }),
+    password: Joi.string().required().min(8).messages({
+      "string.min": "Password must be at least 8 characters.",
+    }),
   }),
 });
 
 module.exports.validateItemId = celebrate({
   params: Joi.object().keys({
-    itemId: Joi.string()
-      .required()
-      .custom(validateHexadecimal)
-      .messages({ "string.hex": "Invalid ID" }),
+    itemId: Joi.string().required().custom(validateHexadecimal).messages({
+      "string.hex": "Invalid ID",
+    }),
   }),
 });
 

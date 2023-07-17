@@ -37,8 +37,8 @@ const createUser = async (req, res, next) => {
       password: hashedPassword,
     });
 
-    const { password: _hashedPassword, ...userWithoutPassword } = newUser._doc;
-    // Exclude password from the returned user object
+    const userWithoutPassword = newUser.toObject();
+    delete userWithoutPassword.password; // Exclude password from the returned user object
 
     const responseData = userWithoutPassword;
     return res.json(responseData);
@@ -50,6 +50,7 @@ const createUser = async (req, res, next) => {
     return next(err);
   }
 };
+
 const updateProfile = async (req, res, next) => {
   try {
     const { _id } = req.user;
@@ -66,10 +67,10 @@ const updateProfile = async (req, res, next) => {
       return next(new NotFoundError("User not found"));
     }
 
-    return res.json(updatedUser); // Added return statement
+    return res.json(updatedUser);
   } catch (err) {
     if (err.name === "ValidationError") {
-      return next(new BadRequestError("Conflict error")); // Changed to BadRequestError
+      return next(new BadRequestError("Conflict error"));
     }
 
     return next(err);

@@ -8,13 +8,12 @@ const { errorHandler } = require("../middlewares/errors");
 const getClothingItems = async (req, res, next) => {
   try {
     const clothingItems = await ClothingItem.find();
-    res.json(clothingItems);
+    return res.json(clothingItems);
   } catch (err) {
     next(err);
   }
 };
 
-//this is the function that will be called when a user clicks on a specific item
 const createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const ownerId = req.user && req.user._id;
@@ -26,14 +25,13 @@ const createClothingItem = (req, res, next) => {
     owner: ownerId,
   })
     .then((item) => {
-      res.send({ data: item });
+      return res.send({ data: item });
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError(err.message));
-      } else {
-        next(err);
       }
+      next(err);
     });
 };
 
@@ -43,12 +41,10 @@ const deleteClothingItem = (req, res, next) => {
   ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
-        // Item not found
         throw new NotFoundError("Item not found");
       }
 
       if (item.owner.toString() !== req.user._id.toString()) {
-        // User is not authorized to delete this item
         throw new ForbiddenError("You are not authorized to delete this item");
       }
 
@@ -61,7 +57,6 @@ const deleteClothingItem = (req, res, next) => {
       });
     })
     .catch((err) => {
-      // Catch all errors
       next(err);
     });
 };
@@ -82,6 +77,7 @@ const likeItem = async (req, res, next) => {
     }
   }
 };
+
 const dislikeItem = async (req, res, next) => {
   try {
     const item = await ClothingItem.findByIdAndUpdate(
