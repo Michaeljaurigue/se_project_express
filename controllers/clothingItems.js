@@ -12,6 +12,7 @@ const getClothingItems = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+  return undefined;
 };
 
 const createClothingItem = (req, res, next) => {
