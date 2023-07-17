@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { errorHandler } = require("../utils/errors");
+const { errorHandler } = require("../middlewares/errors");
 
 const { USER_OK } = require("../utils/errorConstants");
 
@@ -9,8 +9,6 @@ const AuthorizationError = require("../middlewares/unauthorizedError");
 const ConflictError = require("../middlewares/conflictError");
 
 const User = require("../models/user");
-
-const { JWT_SECRET } = require("../utils/config");
 
 const getCurrentUser = async (req, res, next) => {
   try {
@@ -83,7 +81,7 @@ const login = async (req, res, next) => {
 
   try {
     const user = await User.findUserByCredentials(email, password);
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 

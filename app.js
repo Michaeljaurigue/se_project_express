@@ -8,7 +8,9 @@ const cors = require("cors");
 const { PORT = 3001, MONGODB_URI } = process.env;
 const app = express();
 
+const { errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
+const { errorHandler } = require("./middlewares/errors");
 
 app.get("/crash-test", () => {
   setTimeout(() => {
@@ -19,8 +21,6 @@ app.get("/crash-test", () => {
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
 });
 
 const db = mongoose.connection;
@@ -46,14 +46,14 @@ app.use(
 
 app.use(requestLogger);
 app.use(routes);
-
 app.use(errorLogger);
 
-app.use((req, res) => {
-  res.status(404).json({ message: "Requested resource not found" });
-});
+app.use(errors());
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
   console.log("Press Ctrl+C to quit.");
 });
+
+module.exports = app;

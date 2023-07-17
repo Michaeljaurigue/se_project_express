@@ -3,7 +3,7 @@ const {
   NOT_FOUND_ERROR,
   INVALID_ID_ERROR,
   DEFAULT_ERROR,
-} = require("./errorConstants");
+} = require("../utils/errorConstants");
 
 module.exports.errorHandler = (err, req, res, next) => {
   if (err.name === "ValidationError") {

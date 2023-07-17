@@ -3,7 +3,7 @@ const NotFoundError = require("../middlewares/notFoundError");
 const ForbiddenError = require("../middlewares/forbiddenError");
 const BadRequestError = require("../middlewares/badRequestError");
 
-const { errorHandler } = require("../utils/errors");
+const { errorHandler } = require("../middlewares/errors");
 
 const getClothingItems = async (req, res, next) => {
   try {
