@@ -24,14 +24,13 @@ const createClothingItem = (req, res, next) => {
     imageUrl,
     owner: ownerId,
   })
-    .then((item) => {
-      return res.send({ data: item });
-    })
+    .then((item) => res.send({ data: item }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return next(new BadRequestError(err.message));
+        next(new BadRequestError(err.message));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 

@@ -7,6 +7,7 @@ const { USER_OK } = require("../utils/errorConstants");
 const NotFoundError = require("../middlewares/notFoundError");
 const AuthorizationError = require("../middlewares/unauthorizedError");
 const ConflictError = require("../middlewares/conflictError");
+const ValidationErrorCode = require("../middlewares/badRequestError");
 
 const User = require("../models/user");
 
@@ -70,7 +71,7 @@ const updateProfile = async (req, res, next) => {
     return res.json(updatedUser);
   } catch (err) {
     if (err.name === "ValidationError") {
-      return next(new BadRequestError("Conflict error"));
+      return next(new ValidationErrorCode("Conflict error"));
     }
 
     return next(err);
