@@ -5,12 +5,13 @@ const mongoose = require("mongoose");
 const helmet = require("helmet");
 const cors = require("cors");
 
-const { PORT = 3001, MONGODB_URI } = process.env;
+const { PORT = 3001 } = process.env;
+
 const app = express();
 
 const { errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
-const { errorHandler } = require("./middlewares/errors");
+const { errorHandler } = require("./middlewares/error-handler");
 
 app.get("/crash-test", () => {
   setTimeout(() => {
@@ -18,15 +19,21 @@ app.get("/crash-test", () => {
   }, 0);
 });
 
-mongoose.connect(MONGODB_URI, {
+mongoose.connect("mongodb://localhost:27017/wtwr", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const db = mongoose.connection;
 
-db.on("error", (err) => console.error("error connecting to db", err));
-db.once("open", () => console.log("connected to db"));
+db.on("error", (err) => {
+  // eslint-disable-next-line no-console
+  console.error("Error connecting to db", err);
+});
+db.once("open", () => {
+  // eslint-disable-next-line no-console
+  console.log("Connected to the database");
+});
 
 app.use(helmet());
 
@@ -44,15 +51,18 @@ app.use(
   })
 );
 
+// app.use(cors());
+
 app.use(requestLogger);
 app.use(routes);
 app.use(errorLogger);
 
 app.use(errors());
-app.use(errorHandler);
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}`);
+  // eslint-disable-next-line no-console
   console.log("Press Ctrl+C to quit.");
 });
 

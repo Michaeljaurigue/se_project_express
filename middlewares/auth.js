@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const { AuthorizationError } = require("./unauthorizedError");
+
+const AuthorizationError = require("./unauthorizedError");
 
 const authMiddleware = (req, res, next) => {
   const { authorization } = req.headers;
@@ -10,8 +11,11 @@ const authMiddleware = (req, res, next) => {
 
   const token = authorization.replace("Bearer ", "");
 
+  const { JWT_SECRET = "dev-key" } = process.env; // Set default value for JWT_SECRET
+
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, JWT_SECRET);
+
     req.user = payload;
     next();
   } catch (error) {

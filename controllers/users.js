@@ -83,7 +83,9 @@ const login = async (req, res, next) => {
 
   try {
     const user = await User.findUserByCredentials(email, password);
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+    const { JWT_SECRET = "dev-key" } = process.env; // Set default value for JWT_SECRET
+
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
       expiresIn: "7d",
     });
 
