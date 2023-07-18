@@ -11,7 +11,7 @@ const app = express();
 
 const { errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
-const { errorHandler } = require("./middlewares/error-handler");
+const errorHandler = require("./middlewares/error-handler");
 
 app.get("/crash-test", () => {
   setTimeout(() => {
@@ -58,6 +58,7 @@ app.use(routes);
 app.use(errorLogger);
 
 app.use(errors());
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
