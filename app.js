@@ -42,7 +42,7 @@ db.once("open", () => {
   console.log("No errors. Hooray!");
 });
 
-// app.use(helmet());
+app.use(helmet());
 
 // CORS middleware setup to dynamically allow specified origins
 app.use(cors({
