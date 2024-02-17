@@ -10,10 +10,15 @@ const getClothingItems = async (req, res, next) => {
     const clothingItems = await ClothingItem.find();
     return res.json(clothingItems);
   } catch (err) {
-    next(err);
+    console.error("Error fetching clothing items:", err); // Log detailed error information to the console
+    // Optionally, customize the error before passing it to the next error handling middleware
+    const error = new Error('Failed to fetch clothing items');
+    error.httpStatusCode = 500; // You can set a specific HTTP status code
+    error.details = err.message; // Include original error message
+    next(error); // Pass the error to the next middleware
   }
-  return undefined;
 };
+
 
 const createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
