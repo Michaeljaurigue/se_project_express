@@ -72,7 +72,6 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
   console.log("Press Ctrl+C to quit.");
-  console.log("Allowed origins:", allowedOrigins.join(", "));
   console.log("Do it now!")
 });
 
