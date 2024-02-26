@@ -16,8 +16,7 @@ const errorHandler = require("./middlewares/error-handler");
 // Define allowed origins
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://wtwr.devwonders.com",
-  "https://www.wtwr.devwonders.com",
+  "https://wtwrapp.netlify.app/"
 ];
 
 app.get("/crash-test", () => {
